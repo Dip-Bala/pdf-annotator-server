@@ -5,14 +5,16 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import { v4 as uuidv4 } from "uuid";
 import { Pdf } from './models/schema.js';
+import authRouter from './routes/auth.js';
 dotenv.config();
 
 const app = express();
 app.use(express.static('public')); //to serve files from the public directory
 app.use(cors());
 
-const dbUrl = process.env.DB as string;
+const {DB_URL, PORT} = process.env;
 
+app.post("/auth", authRouter)
 app.post("/upload", upload.single("file"), async(req, res) => {
   try {
     const uuid = uuidv4();
@@ -38,8 +40,8 @@ app.post("/upload", upload.single("file"), async(req, res) => {
 
 async function main(){
     try{
-        await mongoose.connect(dbUrl);
-        app.listen(8000, () => console.log(`Server is running on http://localhost:${8000}`));
+        await mongoose.connect(DB_URL as string);
+        app.listen(PORT, () => console.log(`Server is running on http://localhost:${PORT}`));
     }
     catch(e){
        console.log("Database Connection Error");
